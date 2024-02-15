@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://77xrrchrcdlg"]
+[gd_scene load_steps=26 format=3 uid="uid://77xrrchrcdlg"]
 
 [ext_resource type="Texture2D" uid="uid://bgspafod557dn" path="res://Assets/EntitiesAssets/Characters/Champions/Kanji.png" id="1_12aos"]
 [ext_resource type="Script" path="res://Scripts/Player/player.cs" id="1_gxih0"]
@@ -35,6 +35,18 @@ region = Rect2(32, 96, 16, 16)
 atlas = ExtResource("1_12aos")
 region = Rect2(48, 96, 16, 16)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_4af3c"]
+atlas = ExtResource("1_12aos")
+region = Rect2(0, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u1blx"]
+atlas = ExtResource("1_12aos")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bnvf3"]
+atlas = ExtResource("1_12aos")
+region = Rect2(0, 32, 16, 16)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_q2p8s"]
 atlas = ExtResource("1_12aos")
 region = Rect2(64, 48, 16, 16)
@@ -42,10 +54,6 @@ region = Rect2(64, 48, 16, 16)
 [sub_resource type="AtlasTexture" id="AtlasTexture_yqi77"]
 atlas = ExtResource("1_12aos")
 region = Rect2(64, 32, 16, 16)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_m1bla"]
-atlas = ExtResource("1_12aos")
-region = Rect2(0, 48, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_sfuga"]
 atlas = ExtResource("1_12aos")
@@ -62,10 +70,6 @@ region = Rect2(48, 48, 16, 16)
 [sub_resource type="AtlasTexture" id="AtlasTexture_6kurh"]
 atlas = ExtResource("1_12aos")
 region = Rect2(64, 48, 16, 16)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_x5mc1"]
-atlas = ExtResource("1_12aos")
-region = Rect2(0, 32, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mytkb"]
 atlas = ExtResource("1_12aos")
@@ -121,6 +125,30 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_4af3c")
+}],
+"loop": true,
+"name": &"CrouchLeft",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u1blx")
+}],
+"loop": true,
+"name": &"CrouchNeutral",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bnvf3")
+}],
+"loop": true,
+"name": &"CrouchRight",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_q2p8s")
 }],
 "loop": true,
@@ -136,9 +164,6 @@ animations = [{
 "speed": 5.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_m1bla")
-}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_sfuga")
 }, {
@@ -157,9 +182,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_x5mc1")
-}, {
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_mytkb")
 }, {
 "duration": 1.0,
@@ -177,7 +199,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l64kf"]
-size = Vector2(12, 14.125)
+size = Vector2(12, 13.125)
 
 [node name="Player" type="Node2D"]
 script = ExtResource("1_gxih0")
@@ -189,11 +211,11 @@ texture_filter = 1
 position = Vector2(-2, -2)
 scale = Vector2(1.0625, 1.0625)
 sprite_frames = SubResource("SpriteFrames_e4j8g")
-animation = &"IdleRight"
+animation = &"AttackRight"
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
-position = Vector2(6, 6.9375)
+position = Vector2(6, 6.4375)
 shape = SubResource("RectangleShape2D_l64kf")
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
@@ -203,7 +225,7 @@ zoom = Vector2(4, 4)
 [node name="RayCast2D" type="RayCast2D" parent="CharacterBody2D"]
 position = Vector2(6, 7)
 scale = Vector2(0.640001, 1)
-target_position = Vector2(0, 8)
+target_position = Vector2(0, 7)
 
 [node name="RayCast2D2" type="RayCast2D" parent="CharacterBody2D"]
 position = Vector2(12, 7)

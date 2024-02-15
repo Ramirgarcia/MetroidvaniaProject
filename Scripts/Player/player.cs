@@ -1,67 +1,134 @@
 using Godot;
 using System;
+using System.Security.AccessControl;
 
 public partial class player : Node2D
 {
 	
-	private Godot.Vector2 InputDirection;
+	private Vector2 Motion;
 	private Godot.CharacterBody2D PlayerBody;
 	private AnimatedSprite2D Animation;
 	private RayCast2D PlayerBodyRay;
 
 	private string PlayerDirection;
+	private string PlayerAnimation;
+	private int PreviousDirectionEnum;
 
 	[Export]
-	public int Speed { get; set; } = 10;
+	public int Speed { get; set; } = 5;
 	private int GameStateOverworld;
-	public int Gravity {get; set;} = 100;
+
+	[Export]
+	public float JumpHeight = 100.0f;
+	[Export]
+	public float JumpTimeToPeak = 0.2f;
+	[Export]
+	public float JumpTimeToDescent = 0.4f;
+	public  float JumpVelocity; 
+	public float JumpGravity;
+	public float FallGravity; 
+	
 
 
 	public override void _Ready()
 	{	
-
+		JumpVelocity = (2.0f * JumpHeight) / (JumpTimeToPeak) * -1.0f;
+		JumpGravity = ((-2.0f * JumpHeight) / (JumpTimeToPeak * JumpTimeToPeak)) * -1.0f;
+		FallGravity = ((-2.0f * JumpHeight) / (JumpTimeToDescent * JumpTimeToDescent)) * -1.0f;
 		PlayerBody = GetChild<CharacterBody2D>(0);
 		PlayerBodyRay = PlayerBody.GetChild<RayCast2D>(3);
 		Animation = PlayerBody.GetChild<AnimatedSprite2D>(0);
 		GameStateOverworld = 0;
-
+		
 	}
 	
 		public void GetInput()
 	{
-		InputDirection = Input.GetVector("Left", "Right", "Up", "Down");
-		InputDirection.Y = 0;
-		PlayerBody.Velocity= InputDirection * Speed;
+		var XDirection = Input.GetAxis("Left","Right");
+		Motion = PlayerBody.Velocity;
+		Motion.X = XDirection * Speed;
+		PlayerBody.Velocity= Motion;
 	}
 
 
-	public Godot.Vector2 ApplyGravity(double delta)
+	public float ApplyGravity()
 	{
-		var Velocity = PlayerBody.Velocity;
+		var Velocity = Motion;
 
-
-
-		if (PlayerBodyRay.IsColliding())
+		if (Velocity.Y < 0.0)
 		{
-			Velocity.Y = 0;
+			return JumpGravity;
 		}
-
-		else
-		{
-			Velocity.Y += (float)delta * Gravity;
+		else{
+			return FallGravity;
 		}
-		if (Input.IsActionJustReleased("Jump"))
-		{
-			Velocity.Y = -30;
-			GD.Print("hi");
-		}
-		//PlayerBody.Velocity = Velocity;
-
+	}
+	public Vector2 Jump()
+	{
+		var Velocity = Motion;
+		Velocity.Y = JumpVelocity;
 		return Velocity;
 	}
-	public void PlayPassiveAnimation()
+
+	public void PlayWalkingAnimation(int PlayerDirectionEnum)
 	{
-		int PlayerDirectionEnum = 0;
+		string NewPlayerAnimation = "";
+		switch (PlayerDirectionEnum)
+		{
+			case(0):
+				NewPlayerAnimation = "IdleRight";
+			break;
+			case(1):
+			break;
+			case(2): //UP
+				//NewPlayerAnimation = "Jump";
+			break;
+			case(3):
+			break;
+			case(4):
+				NewPlayerAnimation = "Left";
+			break;
+			case(5):
+				if(PreviousDirectionEnum == 6 || PreviousDirectionEnum == 3 || PreviousDirectionEnum == 9)
+				{
+					NewPlayerAnimation = "IdleRight";
+				}
+				else if (PreviousDirectionEnum == 4 || PreviousDirectionEnum == 1 || PreviousDirectionEnum == 7)
+				{
+					NewPlayerAnimation = "IdleLeft";
+				}
+				else
+				{
+					NewPlayerAnimation = PlayerAnimation;
+				}
+			break;
+			case(6):
+				NewPlayerAnimation = "Right";
+			break;
+			case(7):
+			break;
+			case(8):
+				NewPlayerAnimation = "CrouchNeutral";
+				//Crouch  
+			break;      
+			case(9):
+
+			break;
+		}
+		if(Input.IsActionJustPressed("Attack") && (NewPlayerAnimation == "IdleLeft" || NewPlayerAnimation == "Left")){
+			NewPlayerAnimation = "AttackLeft";
+		}
+		else if(Input.IsActionJustPressed("Attack") && (NewPlayerAnimation == "IdleRight" || NewPlayerAnimation == "Right")){
+			NewPlayerAnimation = "AttackRight";
+		}
+		PreviousDirectionEnum = PlayerDirectionEnum;
+		PlayerAnimation = NewPlayerAnimation;
+		Animation.Play(PlayerAnimation); 
+		
+	}
+	public int GetInputDirection()
+	{
+		int PlayerDirectionEnum;
 		if(Input.IsActionPressed("Right"))
 		{
 			if(Input.IsActionPressed("Left")){
@@ -121,25 +188,39 @@ public partial class player : Node2D
 			else {
 				PlayerDirectionEnum = 8;
 			}
-			PlayerDirectionEnum = 8;
 		}
 		else{
 			PlayerDirectionEnum = 5;
 		}
+		return PlayerDirectionEnum;
 	}
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	
 	public override void _PhysicsProcess(double delta)
 	{
 
+
 		switch(GameStateOverworld)
 		{
 			case(0):
-				Godot.Vector2 Motion;
 				GetInput();
-				Motion = ApplyGravity(delta);
-				PlayerBody.MoveAndCollide(Motion);
-				PlayPassiveAnimation();
+				if (!PlayerBodyRay.IsColliding())
+				{
+					Motion.Y += ApplyGravity() * (float)delta;
+				}
+				else{
+					Motion.Y = 0;
+				}
+				if (Input.IsActionJustPressed("Jump") && PlayerBodyRay.IsColliding())
+				{
+					Motion.Y = JumpVelocity;
+				}
+				PlayerBody.Velocity = Motion;
+				PlayerBody.MoveAndCollide(PlayerBody.Velocity);
+				GD.Print(PlayerBody.Velocity);
+				PlayWalkingAnimation(GetInputDirection());
+
+				
 			break;
 			case(1):
 				
