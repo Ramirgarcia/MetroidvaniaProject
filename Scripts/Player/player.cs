@@ -27,6 +27,7 @@ public partial class player : Node2D
 	public  float JumpVelocity; 
 	public float JumpGravity;
 	public float FallGravity; 
+	private bool IsOnFloor;
 	
 
 
@@ -117,14 +118,42 @@ public partial class player : Node2D
 		}
 		if(Input.IsActionJustPressed("Attack") && (NewPlayerAnimation == "IdleLeft" || NewPlayerAnimation == "Left")){
 			NewPlayerAnimation = "AttackLeft";
+			GameStateOverworld = 1;
 		}
 		else if(Input.IsActionJustPressed("Attack") && (NewPlayerAnimation == "IdleRight" || NewPlayerAnimation == "Right")){
 			NewPlayerAnimation = "AttackRight";
+			GameStateOverworld = 1;
 		}
 		PreviousDirectionEnum = PlayerDirectionEnum;
 		PlayerAnimation = NewPlayerAnimation;
 		Animation.Play(PlayerAnimation); 
 		
+	}
+
+	public void AttackKeepLocationAndTrackAnimation()
+	{
+		var CurrFrame = Animation.Frame;
+		SetProcessInput(false);
+		switch(CurrFrame)
+		{
+			case(0):
+				break;
+			case(1):
+			//PERMANENT CHANGE PLAYERBODY TO VAR
+				PlayerBody.GetChild<CollisionShape2D>(5).Disabled = false;
+				break;
+			case(2):
+				PlayerBody.GetChild<CollisionShape2D>(5).Disabled = true;
+				break;
+			case(3):
+				GameStateOverworld = 0;
+				//CHANGE TO HAVE LOGIC BETWEEN RIGHT AND LEFT
+				Animation.Play("IdleRight");
+				SetProcessInput(true);
+				break;
+			default:
+			break;
+		}
 	}
 	public int GetInputDirection()
 	{
@@ -207,13 +236,16 @@ public partial class player : Node2D
 				if (!PlayerBodyRay.IsColliding())
 				{
 					Motion.Y += ApplyGravity() * (float)delta;
+					IsOnFloor = false;
 				}
 				else{
 					Motion.Y = 0;
+					IsOnFloor = true;
 				}
 				if (Input.IsActionJustPressed("Jump") && PlayerBodyRay.IsColliding())
 				{
 					Motion.Y = JumpVelocity;
+					IsOnFloor = false;
 				}
 				PlayerBody.Velocity = Motion;
 				PlayerBody.MoveAndCollide(PlayerBody.Velocity);
@@ -222,8 +254,9 @@ public partial class player : Node2D
 
 				
 			break;
+			// Attack
 			case(1):
-				
+				AttackKeepLocationAndTrackAnimation();
 			break;
 		}
 
