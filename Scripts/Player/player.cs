@@ -27,6 +27,7 @@ public partial class player : Node2D
 	public  float JumpVelocity; 
 	public float JumpGravity;
 	public float FallGravity; 
+	private bool IsOnFloor;
 	
 
 
@@ -50,6 +51,10 @@ public partial class player : Node2D
 		PlayerBody.Velocity= Motion;
 	}
 
+	public void Print(string str)
+	{
+		GD.Print(str);
+	}
 
 	public float ApplyGravity()
 	{
@@ -89,6 +94,14 @@ public partial class player : Node2D
 				NewPlayerAnimation = "Left";
 			break;
 			case(5):
+				if(PlayerAnimation == "AttackRight" && GameStateOverworld == 0)
+				{
+					PreviousDirectionEnum = 6;
+				}
+				else if (PlayerAnimation == "AttackLeft" && GameStateOverworld == 0)
+				{
+					PreviousDirectionEnum = 4;
+				}
 				if(PreviousDirectionEnum == 6 || PreviousDirectionEnum == 3 || PreviousDirectionEnum == 9)
 				{
 					NewPlayerAnimation = "IdleRight";
@@ -117,14 +130,47 @@ public partial class player : Node2D
 		}
 		if(Input.IsActionJustPressed("Attack") && (NewPlayerAnimation == "IdleLeft" || NewPlayerAnimation == "Left")){
 			NewPlayerAnimation = "AttackLeft";
+			PlayerDirection = "Left";
+			GameStateOverworld = 1;
+			GD.Print("Hi");
 		}
 		else if(Input.IsActionJustPressed("Attack") && (NewPlayerAnimation == "IdleRight" || NewPlayerAnimation == "Right")){
 			NewPlayerAnimation = "AttackRight";
+			PlayerDirection = "Right";
+			GameStateOverworld = 1;
+			GD.Print("Hi");
 		}
 		PreviousDirectionEnum = PlayerDirectionEnum;
 		PlayerAnimation = NewPlayerAnimation;
 		Animation.Play(PlayerAnimation); 
 		
+	}
+
+	public void AttackKeepLocationAndTrackAnimation()
+	{
+		var CurrFrame = Animation.Frame;
+		SetProcessInput(false);
+		switch(CurrFrame)
+		{
+			case(0):
+				break;
+			case(1):
+			//PERMANENT CHANGE PLAYERBODY TO VAR
+				PlayerBody.GetChild<CollisionShape2D>(5).Disabled = false;
+				break;
+			case(2):
+				PlayerBody.GetChild<CollisionShape2D>(5).Disabled = true;
+				break;
+			case(3):
+				GameStateOverworld = 0;
+				//CHANGE TO HAVE LOGIC BETWEEN RIGHT AND LEFT
+				Print(GetInputDirection().ToString());
+				PlayWalkingAnimation(GetInputDirection());
+				SetProcessInput(true);
+				break;
+			default:
+			break;
+		}
 	}
 	public int GetInputDirection()
 	{
@@ -207,23 +253,26 @@ public partial class player : Node2D
 				if (!PlayerBodyRay.IsColliding())
 				{
 					Motion.Y += ApplyGravity() * (float)delta;
+					IsOnFloor = false;
 				}
 				else{
 					Motion.Y = 0;
+					IsOnFloor = true;
 				}
 				if (Input.IsActionJustPressed("Jump") && PlayerBodyRay.IsColliding())
 				{
 					Motion.Y = JumpVelocity;
+					IsOnFloor = false;
 				}
 				PlayerBody.Velocity = Motion;
 				PlayerBody.MoveAndCollide(PlayerBody.Velocity);
-				GD.Print(PlayerBody.Velocity);
 				PlayWalkingAnimation(GetInputDirection());
 
 				
 			break;
+			// Attack
 			case(1):
-				
+				AttackKeepLocationAndTrackAnimation();
 			break;
 		}
 
