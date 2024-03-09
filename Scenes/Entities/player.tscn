@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://77xrrchrcdlg"]
+[gd_scene load_steps=26 format=3 uid="uid://77xrrchrcdlg"]
 
 [ext_resource type="Texture2D" uid="uid://bgspafod557dn" path="res://Assets/EntitiesAssets/Characters/Champions/Kanji.png" id="1_12aos"]
 [ext_resource type="Script" path="res://Scripts/Player/player.cs" id="1_gxih0"]
@@ -201,10 +201,6 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l64kf"]
 size = Vector2(12, 13.125)
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_bv2pl"]
-a = Vector2(14, -6.4375)
-b = Vector2(14, 7)
-
 [node name="Player" type="Node2D"]
 script = ExtResource("1_gxih0")
 
@@ -215,9 +211,7 @@ texture_filter = 1
 position = Vector2(-2, -2)
 scale = Vector2(1.0625, 1.0625)
 sprite_frames = SubResource("SpriteFrames_e4j8g")
-animation = &"AttackRight"
-frame = 1
-frame_progress = 0.918286
+animation = &"CrouchLeft"
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
@@ -229,16 +223,6 @@ position = Vector2(6, 7)
 zoom = Vector2(4, 4)
 
 [node name="RayCast2D" type="RayCast2D" parent="CharacterBody2D"]
-position = Vector2(6, 7)
+position = Vector2(12, 7)
 scale = Vector2(0.640001, 1)
 target_position = Vector2(0, 7)
-
-[node name="RayCast2D2" type="RayCast2D" parent="CharacterBody2D"]
-position = Vector2(12, 7)
-target_position = Vector2(0, 8)
-
-[node name="AttackHitBox" type="CollisionShape2D" parent="CharacterBody2D"]
-position = Vector2(0, 6)
-shape = SubResource("SegmentShape2D_bv2pl")
-disabled = true
-debug_color = Color(0.901961, 0, 0.752941, 0.419608)

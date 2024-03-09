@@ -177,6 +177,7 @@ public partial class player : Node2D
 		int PlayerDirectionEnum;
 		if(Input.IsActionPressed("Right"))
 		{
+			PlayerDirection = "Right";
 			if(Input.IsActionPressed("Left")){
 				PlayerDirectionEnum = 5; 
 			}
@@ -192,6 +193,7 @@ public partial class player : Node2D
 		}
 		else if(Input.IsActionPressed("Left"))
 		{
+			PlayerDirection = "Left";
 			if(Input.IsActionPressed("Right")){
 			PlayerDirectionEnum = 5;
 			}
@@ -209,9 +211,11 @@ public partial class player : Node2D
 		{
 			if(Input.IsActionPressed("Right")){
 				PlayerDirectionEnum = 3;
+				PlayerDirection = "Right";
 			}
 			else if(Input.IsActionPressed("Left")){
 				PlayerDirectionEnum = 1; 
+				PlayerDirection = "Left";
 			}
 			else if(Input.IsActionPressed("Down")){
 				PlayerDirectionEnum = 5; 
@@ -224,12 +228,14 @@ public partial class player : Node2D
 		{
 			if(Input.IsActionPressed("Right")){
 				PlayerDirectionEnum = 9;
+				PlayerDirection = "Right";
 			}
 			else if(Input.IsActionPressed("Up")){
 				PlayerDirectionEnum = 5; 
 			}
 			else if(Input.IsActionPressed("Left")){
 				PlayerDirectionEnum = 7; 
+				PlayerDirection = "Left";
 			}
 			else {
 				PlayerDirectionEnum = 8;
@@ -250,6 +256,15 @@ public partial class player : Node2D
 		{
 			case(0):
 				GetInput();
+				if (PlayerDirection == "Right")
+				{
+					PlayerBodyRay.Position = new Vector2(0, PlayerBodyRay.Position.Y);
+				}
+				else
+				{
+					PlayerBodyRay.Position = new Vector2(12, PlayerBodyRay.Position.Y);
+				}
+
 				if (!PlayerBodyRay.IsColliding())
 				{
 					Motion.Y += ApplyGravity() * (float)delta;
